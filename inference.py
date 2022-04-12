@@ -14,7 +14,6 @@ rnn_units = 512
 
 def get_vocab_maps(text):
     vocab = sorted(set(text))
-    print(vocab_size, len(vocab))
     assert(vocab_size == len(vocab))
     
     char2idx = {u:i for i, u in enumerate(vocab)}
@@ -39,7 +38,7 @@ def build_model(vocab_size, embedding_dim, rnn_units, batch_size):
 
 def build_inf_model(path_to_checkpoint):
     model = build_model(vocab_size, embedding_dim, rnn_units, batch_size=1)
-    model.load_weights(tf2.train.latest_checkpoint(path_to_checkpoint))
+    model.load_weights(tf2.train.latest_checkpoint(path_to_checkpoint)).expect_partial()
     model.build(tf2.TensorShape([1, None]))
     return model
 

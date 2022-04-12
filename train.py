@@ -17,7 +17,6 @@ rnn_units = 512
 
 def get_vocab_maps(text):
     vocab = sorted(set(text))
-    print(vocab_size, len(vocab))
     assert(vocab_size == len(vocab))
     
     char2idx = {u:i for i, u in enumerate(vocab)}
