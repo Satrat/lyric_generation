@@ -4,9 +4,9 @@ import numpy as np
 import tensorflow as tf
 from shared import *
 
-def generate_text(model, start_string,t, length_char):
+def generate_text(model, lyrics_path, start_string,t, length_char):
     # Evaluation step (generating text using the learned model)
-    text = open('lyrics.txt', 'rb').read().decode(encoding='utf-8')
+    text = open(lyrics_path, 'rb').read().decode(encoding='utf-8')
     char2idx, idx2char = get_vocab_maps(text)
 
     # Number of characters to generate
@@ -43,10 +43,10 @@ def generate_text(model, start_string,t, length_char):
 
     result = (start_string + ''.join(text_generated))
     result = result.replace('  ', ' ')
-    return result.lower()[:-1] #skip last word since its probably incomplete
+    return result
 
-def build_inf_model():
+def build_inf_model(path_to_checkpoint):
     model = build_model(vocab_size, embedding_dim, rnn_units, batch_size=1)
-    model.load_weights(tf.train.latest_checkpoint(LATEST_CHECKPOINT_DIR))
+    model.load_weights(tf.train.latest_checkpoint(path_to_checkpoint))
     model.build(tf.TensorShape([1, None]))
     return model
