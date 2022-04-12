@@ -3,7 +3,7 @@ import os
 import numpy as np
 import tensorflow as tf2
 
-BATCH_SIZE = 250
+BATCH_SIZE = 300
 BUFFER_SIZE = 10000
 EPOCHS = 200
 LYRICS_DATA_DIR = './data'
@@ -11,7 +11,7 @@ LYRICS_CHECKPOINT_DIR = './training_checkpoints_final'
 LATEST_CHECKPOINT_DIR = './best_checkpoint'
 LYRICS_FILE = 'lyrics.txt'
 
-vocab_size = 38
+vocab_size = 37
 embedding_dim = 256
 rnn_units = 512
 
@@ -130,6 +130,7 @@ if __name__ == "__main__":
     f.write(text)
     f.close()
     text = open(LYRICS_FILE, 'rb').read().decode(encoding='utf-8')
+    text = text.replace('\r\n', '\n')
     
     char2idx, idx2char = get_vocab_maps(text)
     text_as_int = get_text_as_int(text, char2idx)

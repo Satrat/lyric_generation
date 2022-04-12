@@ -8,7 +8,7 @@ LYRICS_CHECKPOINT_DIR = './training_checkpoints'
 LATEST_CHECKPOINT_DIR = './best_checkpoint'
 LYRICS_FILE = 'lyrics.txt'
 
-vocab_size = 38
+vocab_size = 37
 embedding_dim = 256
 rnn_units = 512
 
@@ -46,6 +46,7 @@ def build_inf_model(path_to_checkpoint):
 def generate_text(model, lyrics_path, start_string,t, length_char):
     # Evaluation step (generating text using the learned model)
     text = open(lyrics_path, 'rb').read().decode(encoding='utf-8')
+    text = text.replace('\r\n', '\n')
     char2idx, idx2char = get_vocab_maps(text)
 
     # Number of characters to generate
