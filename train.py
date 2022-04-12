@@ -7,9 +7,39 @@ from shared import *
 BATCH_SIZE = 250
 BUFFER_SIZE = 10000
 EPOCHS = 150
+LYRICS_DATA_DIR = './data'
+LYRICS_CHECKPOINT_DIR = './training_checkpoints'
+LATEST_CHECKPOINT_DIR = './best_checkpoint'
+LYRICS_FILE = 'lyrics.txt'
+
 vocab_size = 38
 embedding_dim = 256
 rnn_units = 512
+
+def get_vocab_maps(text):
+    vocab = sorted(set(text))
+    global vocab_size
+    vocab_size = len(vocab)
+    
+    char2idx = {u:i for i, u in enumerate(vocab)}
+    idx2char = np.array(vocab)
+    return char2idx, idx2char
+
+def build_model(vocab_size, embedding_dim, rnn_units, batch_size):
+    model = tf.keras.Sequential([
+        tf.keras.layers.Embedding(vocab_size, embedding_dim,
+                                  batch_input_shape=[batch_size, None]),
+        tf.keras.layers.GRU(rnn_units,
+                            return_sequences=True,
+                            stateful=True,
+                            recurrent_initializer='glorot_uniform'),
+        tf.keras.layers.GRU(rnn_units,
+                            return_sequences=True,
+                            stateful=True,
+                            recurrent_initializer='glorot_uniform'),
+        tf.keras.layers.Dense(vocab_size)
+    ])
+    return model
 
 def cleaning(df):
     a=[]
@@ -97,8 +127,8 @@ def split_input_target(chunk):
 
 if __name__ == "__main__":
     text = preprocess_lyrics(LYRICS_DATA_DIR)
-    f = open(FILE, "w")
-    f.write(final_str)
+    f = open(LYRICS_FILE, "w")
+    f.write(text)
     f.close()
     
     char2idx, idx2char = get_vocab_maps(text)
@@ -115,7 +145,10 @@ if __name__ == "__main__":
     dataset = dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE, drop_remainder=True)
     
     #build model
-    model = build_model(vocab_size=len(vocab), embedding_dim=embedding_dim, rnn_units=rnn_units, batch_size=BATCH_SIZE)
+    model = build_model(vocab_size=vocab_size, embedding_dim=embedding_dim, rnn_units=rnn_units, batch_size=BATCH_SIZE)
+    for input_example_batch, target_example_batch in dataset.take(1):
+        example_batch_predictions = model(input_example_batch)
+        print(example_batch_predictions.shape, "# (batch_size, sequence_length, vocab_size)")
     model.summary()
 
     sampled_indices = tf.random.categorical(example_batch_predictions[0], num_samples=1)
