@@ -1,14 +1,13 @@
 import pandas as pd
 import os
 import numpy as np
-import tensorflow.compat.v1 as tf
-from shared import *
+import tensorflow as tf2
 
 BATCH_SIZE = 250
 BUFFER_SIZE = 10000
-EPOCHS = 150
+EPOCHS = 200
 LYRICS_DATA_DIR = './data'
-LYRICS_CHECKPOINT_DIR = './training_checkpoints'
+LYRICS_CHECKPOINT_DIR = './training_checkpoints_final'
 LATEST_CHECKPOINT_DIR = './best_checkpoint'
 LYRICS_FILE = 'lyrics.txt'
 
@@ -18,26 +17,26 @@ rnn_units = 512
 
 def get_vocab_maps(text):
     vocab = sorted(set(text))
-    global vocab_size
-    vocab_size = len(vocab)
+    print(vocab_size, len(vocab))
+    assert(vocab_size == len(vocab))
     
     char2idx = {u:i for i, u in enumerate(vocab)}
     idx2char = np.array(vocab)
     return char2idx, idx2char
 
 def build_model(vocab_size, embedding_dim, rnn_units, batch_size):
-    model = tf.keras.Sequential([
-        tf.keras.layers.Embedding(vocab_size, embedding_dim,
+    model = tf2.keras.Sequential([
+        tf2.keras.layers.Embedding(vocab_size, embedding_dim,
                                   batch_input_shape=[batch_size, None]),
-        tf.keras.layers.GRU(rnn_units,
+        tf2.keras.layers.GRU(rnn_units,
                             return_sequences=True,
                             stateful=True,
                             recurrent_initializer='glorot_uniform'),
-        tf.keras.layers.GRU(rnn_units,
+        tf2.keras.layers.GRU(rnn_units,
                             return_sequences=True,
                             stateful=True,
                             recurrent_initializer='glorot_uniform'),
-        tf.keras.layers.Dense(vocab_size)
+        tf2.keras.layers.Dense(vocab_size)
     ])
     return model
 
@@ -130,6 +129,7 @@ if __name__ == "__main__":
     f = open(LYRICS_FILE, "w")
     f.write(text)
     f.close()
+    text = open(LYRICS_FILE, 'rb').read().decode(encoding='utf-8')
     
     char2idx, idx2char = get_vocab_maps(text)
     text_as_int = get_text_as_int(text, char2idx)
@@ -139,7 +139,7 @@ if __name__ == "__main__":
     examples_per_epoch = len(text)//(seq_length+1)
 
     # Create training examples / targets
-    char_dataset = tf.data.Dataset.from_tensor_slices(text_as_int)
+    char_dataset = tf2.data.Dataset.from_tensor_slices(text_as_int)
     sequences = char_dataset.batch(seq_length+1, drop_remainder=True)
     dataset = sequences.map(split_input_target)
     dataset = dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE, drop_remainder=True)
@@ -151,10 +151,10 @@ if __name__ == "__main__":
         print(example_batch_predictions.shape, "# (batch_size, sequence_length, vocab_size)")
     model.summary()
 
-    sampled_indices = tf.random.categorical(example_batch_predictions[0], num_samples=1)
-    sampled_indices = tf.squeeze(sampled_indices,axis=-1).numpy()
+    sampled_indices = tf2.random.categorical(example_batch_predictions[0], num_samples=1)
+    sampled_indices = tf2.squeeze(sampled_indices,axis=-1).numpy()
     def loss(labels, logits):
-        return tf.keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
+        return tf2.keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
     example_batch_loss = loss(target_example_batch, example_batch_predictions)
     model.compile(optimizer='adam', loss=loss)
     
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     # Name of the checkpoint files
     checkpoint_prefix = os.path.join(LYRICS_CHECKPOINT_DIR, "ckpt_{epoch}")
 
-    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+    checkpoint_callback = tf2.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_prefix,
         save_weights_only=True)
     
