@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from shared import *
 
 BATCH_SIZE = 250

@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 LYRICS_DATA_DIR = './data'
 LYRICS_CHECKPOINT_DIR = './training_checkpoints'
