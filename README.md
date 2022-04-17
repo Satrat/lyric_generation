@@ -1,10 +1,13 @@
 # Lyric Generation Using GRU
 This repostitory includes training code, dataset and the pretrained model for the lyric generation stage of my computational creativity final project
 
+Link to project notebook: https://colab.research.google.com/drive/1ioiLY0rOm2wufxAT5nqgudOYfPCuPCFs?usp=sharing
+
 Data was taken from this Kaggle dataset: https://www.kaggle.com/datasets/deepshah16/song-lyrics-dataset
 
 And I used the following repository as a starting point for the training code:
 https://github.com/PieroPaialungaAI/SongLyricsGenerator
+
 
 ## Directory Layout
 ### best_checkpoint
