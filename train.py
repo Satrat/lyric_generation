@@ -7,7 +7,7 @@ BATCH_SIZE = 300
 BUFFER_SIZE = 10000
 EPOCHS = 200
 LYRICS_DATA_DIR = './data'
-LYRICS_CHECKPOINT_DIR = './training_checkpoints_final'
+LYRICS_CHECKPOINT_DIR = './training_checkpoints'
 LATEST_CHECKPOINT_DIR = './best_checkpoint'
 LYRICS_FILE = 'lyrics.txt'
 
